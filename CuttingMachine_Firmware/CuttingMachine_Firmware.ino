@@ -106,10 +106,6 @@ const unsigned char* epd_bitmap_allArray[1] = {
   SCLOGO
 };
 
-
-
-
-
 void setup() {
   pinMode(BUTTON_UP, INPUT_PULLUP);
   pinMode(BUTTON_DOWN, INPUT_PULLUP);
@@ -209,8 +205,8 @@ void navigateMenu() {
 
 void displayMenu() {
   display.clearDisplay();
-  display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
   display.setCursor(0, 0);
   if (!inSubMenu) {
     display.setTextSize(2);
@@ -342,7 +338,6 @@ void FEED(int feedcount) {
   }
   delay(100);
 }
-
 
 void setSize() {
   while (true) {
