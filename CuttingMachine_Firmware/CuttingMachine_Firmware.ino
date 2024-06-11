@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+//#include "Assets.h"
 
 #define version "1.0.2"
 #define cuttype "RES" // RES or LED set for Different Types
