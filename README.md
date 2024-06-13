@@ -16,7 +16,10 @@ Parts List:
 - HiLetgo CNC Drive Expansion Board (CNC Shield)
 - 2.42" 128x64 OLED LCD Display (SSD1309) i2C
 - M3 Hardware
+  - Assorted M2 Length Screws, Nuts, Washers
   - Assorted M3 Length Screws, Nuts, Washers
+  - Assorted M5 Length Screws, Nuts, Washers
   - M3 Lever Steering Linkage
   - M3 Link Strut shaft 35mm
-- 2020 Series Rubber Feet
+- 4x 2020 Series Rubber Feet
+- 1x Miniature Linear Sliding Guideway Rail 150mm
