@@ -32,3 +32,4 @@ The OLED screen generally comes configured for SPI interface, and we are using I
 ### Building the Framework
 The Framework for the machine is fairly stratight-forward.  The 30cm struts are mounted as the top and bottom rails.  Use normal corner attachments to make the connections.  The 26cm vertical struts are attached with one in the middle and the other two are attached on the edges to make a 30cm x 30cm frame.  The center vertical is attached at 105mm spacing from center to center.  You can use the Acrylic Cut Head mount as the spacing guide.   Lastly the cross-member can be attached at the horizontal mid-point.
 
+![Frame Dimensions](Dimensions.png)
