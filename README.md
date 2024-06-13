@@ -52,3 +52,6 @@ The Framework for the machine is fairly stratight-forward.  The 30cm struts are 
 
 ### Power Supply
 Picking the right power-supply is an important aspect of any Stepper Motor configuration.   For this machine I used a 12v 15A capable power supply.   This porvided all of the power I needed to run both motors and the arduino electronics.
+
+### 3D Printing
+Several of the STL designs need supports to be printed to ensure they are printed correctly.
