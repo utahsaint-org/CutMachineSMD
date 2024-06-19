@@ -3,7 +3,7 @@
 #include <Adafruit_SSD1306.h>
 //#include "Assets.h"
 
-#define version "1.0.2"
+#define version "1.0.3"
 #define cuttype "RES" // RES or LED set for Different Types
 
 #define SCREEN_WIDTH 128
@@ -17,11 +17,11 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUTTON_BACK A2
 #define BUTTON_SELECT A3
 
-#define CUT_STEP 2
-#define CUT_DIR 5
-#define FEED_STEP 3
-#define FEED_DIR 6
-#define ENABLE 8
+#define CUT_STEP 2  // Cutter Motor Stepper Pin
+#define CUT_DIR 5   // Cutter Motor Direction Pin
+#define FEED_STEP 3 // Feeder Motor Stepper Pin
+#define FEED_DIR 6  // Feeder Motor Direction Pin
+#define ENABLE 8    // Enable Pin
 
 
 int menuIndex = 0;
@@ -293,13 +293,19 @@ void executeSubmenuOption() {
 
 void runCutProgram() {
   display.clearDisplay();
-  display.setCursor(0, 0);
-  display.println("Executing GOBABY");
-  display.display();
   for (int rp = 0; rp < SetUnits; rp++) {
     FEED(SetSize);
     CUT();
+    display.setCursor(0, 0);
+    display.setTextSize(2);
+    display.println("CUTTING");
+    display.setTextSize(3);
+    display.setCursor(0, 24);
+    display.print(" = ");
+    display.println(rp+1);
+    display.display();
   }
+  ClearFeeder(); // Clears the Feed Head
   delay(200);
   inSubMenu = false;
 }
@@ -311,8 +317,28 @@ void runCutTest() {
   display.display();
   FEED(1);
   CUT();
+  ClearFeeder();
   delay(200);
   inSubMenu = false;
+}
+
+void ClearFeeder() {
+  int ClearCount = 40;
+  digitalWrite(FEED_DIR,LOW); // Set Forward
+  for(int y = 0; y < ClearCount; y++) {
+    digitalWrite(FEED_STEP,HIGH);
+    delayMicroseconds(700); // Fast Rotation
+    digitalWrite(FEED_STEP,LOW);
+    delayMicroseconds(700); // Fast Rotation
+  }
+  digitalWrite(FEED_DIR,HIGH); // Set Reverse
+  for(int y = 0; y < ClearCount; y++) {
+    digitalWrite(FEED_STEP,HIGH);
+    delayMicroseconds(700); // Fast Rotation
+    digitalWrite(FEED_STEP,LOW);
+    delayMicroseconds(700); // Fast Rotation
+  }
+  digitalWrite(FEED_DIR,LOW);
 }
 
 void CUT() {
@@ -343,11 +369,14 @@ void setSize() {
   while (true) {
     if (digitalRead(BUTTON_UP) == LOW && SetSize < 1000) SetSize++;
     else if (digitalRead(BUTTON_DOWN) == LOW && SetSize > 1) SetSize--;
-    delay(200);
+    delay(50);
     if (digitalRead(BUTTON_SELECT) == LOW) break;
     display.clearDisplay();
     display.setCursor(0, 0);
-    display.print("Set Size: ");
+    display.setTextSize(2);
+    display.print("SET SIZE\n");
+            display.setCursor(4, 17);
+    display.setTextSize(3);
     display.println(SetSize);
     display.display();
   }
@@ -357,11 +386,14 @@ void setUnits() {
   while (true) {
     if (digitalRead(BUTTON_UP) == LOW && SetUnits < 1000) SetUnits++;
     else if (digitalRead(BUTTON_DOWN) == LOW && SetUnits > 1) SetUnits--;
-    delay(200);
+    delay(50);
     if (digitalRead(BUTTON_SELECT) == LOW) break;
     display.clearDisplay();
     display.setCursor(0, 0);
-    display.print("Set Units: ");
+    display.setTextSize(2);
+    display.print("SET UNITS\n");
+        display.setCursor(4, 17);
+    display.setTextSize(3);
     display.println(SetUnits);
     display.display();
   }
@@ -370,7 +402,10 @@ void setUnits() {
 void runAdjustFWD() {
   display.clearDisplay();
   display.setCursor(0, 0);
-  display.println("Executing GOFWD");
+  display.setTextSize(2);
+  display.println("ADJUSTING");
+  display.setTextSize(3);
+  display.println(">>>> FWD");
   display.display();
 
     digitalWrite(FEED_DIR,LOW);
@@ -385,7 +420,10 @@ void runAdjustFWD() {
 void runAdjustREV() {
   display.clearDisplay();
   display.setCursor(0, 0);
-  display.println("Executing GOREV");
+  display.setTextSize(2);
+  display.println("ADJUSTING");
+  display.setTextSize(3);
+  display.println("<<<< REV");
   display.display();
 
     digitalWrite(FEED_DIR,HIGH);
