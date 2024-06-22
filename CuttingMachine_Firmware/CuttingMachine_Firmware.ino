@@ -52,7 +52,7 @@ void setup() {
   pinMode(FEED_DIR, OUTPUT);
 
   pinMode(ENABLE, OUTPUT);
-  digitalWrite(ENABLE, LOW);
+  digitalWrite(ENABLE, HIGH); // Disable Motors until we enter Main Menu
 
   // Initialize the OLED display
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -61,13 +61,40 @@ void setup() {
   delay(1000);
   LogoDisplay();
   delay(1500);
-  displayIdleScreen();
 }
+
+int frame=0;
 
 void loop() {
   if (readButton(BUTTON_SELECT) == true) {
     navigateMenu();
   }
+  if (readButton(BUTTON_UP) == true) { digitalWrite(ENABLE, HIGH); }
+
+  display.clearDisplay();
+  display.drawBitmap(78, 0, frames[frame], FRAME_WIDTH, FRAME_HEIGHT, 1);
+  display.setCursor(0, 0);
+  display.setTextSize(2);
+  display.println("IDLE");
+  display.setTextSize(1);
+  display.print("Size: ");
+  display.println(SetSize);
+  display.print("Units: ");
+  display.println(SetUnits);
+  if (digitalRead(READ_TAPE) == LOW) {
+    display.println("Sensor: LOW");
+  } else {
+    display.println("Sensor: HIGH");
+  }
+ if (digitalRead(ENABLE) == LOW) {
+    display.println("Motors: ENABd");
+  } else {
+    display.println("Motors: IDLE");
+  }
+  display.println("\nPress SELECT to Start");
+  display.display();
+  frame = (frame + 1) % FRAME_COUNT;
+  delay(FRAME_DELAY);
 }
 
 bool readButton(int buttonPin) {
@@ -86,12 +113,6 @@ void FirmwareDisplay() {
   display.setTextSize(1);
   display.print("Firmware: ");
   display.println(version);
-  if (digitalRead(READ_TAPE) == LOW) {
-    display.println("Sensor: LOW");
-  } else {
-    display.println("Sensor: HIGH");
-  }
-
   display.display();
 }
 
@@ -101,23 +122,9 @@ void LogoDisplay() {
   display.display();
 }
 
-void displayIdleScreen() {
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0, 0);
-  display.setTextSize(2);
-  display.println("IDLE");
-  display.setTextSize(1);
-  display.print("Set Size: ");
-  display.println(SetSize);
-  display.print("Set Units: ");
-  display.println(SetUnits);
-  display.display();
-}
-
 void navigateMenu() {
   //delay(200);
+  digitalWrite(ENABLE, LOW);
   while (true) {
     displayMenu();
     if (readButton(BUTTON_SELECT) == true) {
@@ -131,7 +138,7 @@ void navigateMenu() {
         inSubMenu = false;
         submenuIndex = 0;
       } else {
-        displayIdleScreen();
+        //displayIdleScreen();
         return;
       }
     } else if (readButton(BUTTON_UP) == true) {
@@ -295,13 +302,13 @@ void runCutTest() {
 }
 
 void ClearFeeder() {
-  int ClearCount = 40;
+  int ClearCount = 10;
   digitalWrite(FEED_DIR, LOW); // Set Forward
   for (int y = 0; y < ClearCount; y++) {
     digitalWrite(FEED_STEP, HIGH);
-    delayMicroseconds(700); // Fast Rotation
+    delayMicroseconds(1700); // Fast Rotation
     digitalWrite(FEED_STEP, LOW);
-    delayMicroseconds(700); // Fast Rotation
+    delayMicroseconds(1700); // Fast Rotation
   }
   digitalWrite(FEED_DIR, HIGH); // Set Reverse
   for (int y = 0; y < ClearCount; y++) {
