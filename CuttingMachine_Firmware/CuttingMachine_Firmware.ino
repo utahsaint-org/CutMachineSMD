@@ -1,6 +1,9 @@
 #include <Wire.h>
+
 #include <Adafruit_GFX.h>
+
 #include <Adafruit_SSD1306.h>
+
 #include "Assets.h"
 
 #define version "1.0.3"
@@ -8,8 +11,8 @@
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define OLED_RESET -1
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#define OLED_RESET - 1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET);
 
 // Define buttons
 #define BUTTON_UP A0
@@ -18,12 +21,11 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define BUTTON_SELECT A3
 #define READ_TAPE 13
 
-#define CUT_STEP 2  // Cutter Motor Stepper Pin
-#define CUT_DIR 5   // Cutter Motor Direction Pin
+#define CUT_STEP 2 // Cutter Motor Stepper Pin
+#define CUT_DIR 5 // Cutter Motor Direction Pin
 #define FEED_STEP 3 // Feeder Motor Stepper Pin
-#define FEED_DIR 6  // Feeder Motor Direction Pin
-#define ENABLE 8    // Enable Pin
-
+#define FEED_DIR 6 // Feeder Motor Direction Pin
+#define ENABLE 8 // Enable Pin
 
 int menuIndex = 0;
 int submenuIndex = 0;
@@ -32,6 +34,10 @@ bool inSubMenu = false;
 //Set Default Unit Size
 int SetSize = 1;
 int SetUnits = 1;
+
+// Debounce settings
+const unsigned long debounceDelay = 300; // milliseconds
+unsigned long lastDebounceTime = 10;
 
 void setup() {
   pinMode(BUTTON_UP, INPUT_PULLUP);
@@ -59,9 +65,19 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(BUTTON_SELECT) == LOW) {
+  if (readButton(BUTTON_SELECT) == true) {
     navigateMenu();
   }
+}
+
+bool readButton(int buttonPin) {
+  if (digitalRead(buttonPin) == LOW) {
+    if (millis() - lastDebounceTime > debounceDelay) {
+      lastDebounceTime = millis();
+      return true;
+    }
+  }
+  return false;
 }
 
 void FirmwareDisplay() {
@@ -72,8 +88,7 @@ void FirmwareDisplay() {
   display.println(version);
   if (digitalRead(READ_TAPE) == LOW) {
     display.println("Sensor: LOW");
-  }
-    else {
+  } else {
     display.println("Sensor: HIGH");
   }
 
@@ -102,16 +117,16 @@ void displayIdleScreen() {
 }
 
 void navigateMenu() {
-  delay(200);
+  //delay(200);
   while (true) {
     displayMenu();
-    if (digitalRead(BUTTON_SELECT) == LOW) {
+    if (readButton(BUTTON_SELECT) == true) {
       if (inSubMenu) {
         executeSubmenuOption();
       } else {
         enterSubMenu();
       }
-    } else if (digitalRead(BUTTON_BACK) == LOW) {
+    } else if (readButton(BUTTON_BACK) == true) {
       if (inSubMenu) {
         inSubMenu = false;
         submenuIndex = 0;
@@ -119,20 +134,20 @@ void navigateMenu() {
         displayIdleScreen();
         return;
       }
-    } else if (digitalRead(BUTTON_UP) == LOW) {
+    } else if (readButton(BUTTON_UP) == true) {
       if (inSubMenu) {
         submenuIndex = (submenuIndex > 0) ? submenuIndex - 1 : getMaxSubMenuIndex();
       } else {
         menuIndex = (menuIndex > 0) ? menuIndex - 1 : 2;
       }
-    } else if (digitalRead(BUTTON_DOWN) == LOW) {
+    } else if (readButton(BUTTON_DOWN) == true) {
       if (inSubMenu) {
         submenuIndex = (submenuIndex < getMaxSubMenuIndex()) ? submenuIndex + 1 : 0;
       } else {
         menuIndex = (menuIndex < 2) ? menuIndex + 1 : 0;
       }
     }
-    delay(200);
+    //delay(200);
   }
 }
 
@@ -200,27 +215,31 @@ void enterSubMenu() {
 
 int getMaxSubMenuIndex() {
   switch (menuIndex) {
-    case 0: return 1; // CUT! menu has 2 options: Go and Test Cut
-    case 1: return 1; // Settings menu has 2 options: Set Size and Set Units
-    case 2: return 1; // Calibrate menu has 2 options: Adjust FWD and Adjust REV
-    default: return 0;
+  case 0:
+    return 1; // CUT! menu has 2 options: Go and Test Cut
+  case 1:
+    return 1; // Settings menu has 2 options: Set Size and Set Units
+  case 2:
+    return 1; // Calibrate menu has 2 options: Adjust FWD and Adjust REV
+  default:
+    return 0;
   }
 }
 
 void executeSubmenuOption() {
   switch (menuIndex) {
-    case 0: // CUT!
-      if (submenuIndex == 0) runCutProgram();
-      else if (submenuIndex == 1) runCutTest();
-      break;
-    case 1: // Settings
-      if (submenuIndex == 0) setSize();
-      else if (submenuIndex == 1) setUnits();
-      break;
-    case 2: // Calibrate
-      if (submenuIndex == 0) runAdjustFWD();
-      else if (submenuIndex == 1) runAdjustREV();
-      break;
+  case 0: // CUT!
+    if (submenuIndex == 0) runCutProgram();
+    else if (submenuIndex == 1) runCutTest();
+    break;
+  case 1: // Settings
+    if (submenuIndex == 0) setSize();
+    else if (submenuIndex == 1) setUnits();
+    break;
+  case 2: // Calibrate
+    if (submenuIndex == 0) runAdjustFWD();
+    else if (submenuIndex == 1) runAdjustREV();
+    break;
   }
 }
 
@@ -233,7 +252,7 @@ void runCutProgram() {
     display.setTextSize(3);
     display.setCursor(0, 24);
     display.print(" = ");
-    display.println(rp+1);
+    display.println(rp + 1);
     display.display();
     if (digitalRead(READ_TAPE) == LOW) {
       display.clearDisplay();
@@ -244,8 +263,12 @@ void runCutProgram() {
       display.println("\n    Load or Check\n   component tape.");
       display.display();
       delay(500);
-      for(int i=0; i<20; i++) {
-        if (i % 2 == 0) { display.invertDisplay(true); } else { display.invertDisplay(false); }
+      for (int i = 0; i < 20; i++) {
+        if (i % 2 == 0) {
+          display.invertDisplay(true);
+        } else {
+          display.invertDisplay(false);
+        }
         display.display();
         delay(500);
       }
@@ -273,42 +296,42 @@ void runCutTest() {
 
 void ClearFeeder() {
   int ClearCount = 40;
-  digitalWrite(FEED_DIR,LOW); // Set Forward
-  for(int y = 0; y < ClearCount; y++) {
-    digitalWrite(FEED_STEP,HIGH);
+  digitalWrite(FEED_DIR, LOW); // Set Forward
+  for (int y = 0; y < ClearCount; y++) {
+    digitalWrite(FEED_STEP, HIGH);
     delayMicroseconds(700); // Fast Rotation
-    digitalWrite(FEED_STEP,LOW);
-    delayMicroseconds(700); // Fast Rotation
-  }
-  digitalWrite(FEED_DIR,HIGH); // Set Reverse
-  for(int y = 0; y < ClearCount; y++) {
-    digitalWrite(FEED_STEP,HIGH);
-    delayMicroseconds(700); // Fast Rotation
-    digitalWrite(FEED_STEP,LOW);
+    digitalWrite(FEED_STEP, LOW);
     delayMicroseconds(700); // Fast Rotation
   }
-  digitalWrite(FEED_DIR,LOW);
+  digitalWrite(FEED_DIR, HIGH); // Set Reverse
+  for (int y = 0; y < ClearCount; y++) {
+    digitalWrite(FEED_STEP, HIGH);
+    delayMicroseconds(700); // Fast Rotation
+    digitalWrite(FEED_STEP, LOW);
+    delayMicroseconds(700); // Fast Rotation
+  }
+  digitalWrite(FEED_DIR, LOW);
 }
 
 void CUT() {
   int cutsteps = 800;
-    for(int x = 0; x < cutsteps; x++) {
-    digitalWrite(CUT_STEP,HIGH);
+  for (int x = 0; x < cutsteps; x++) {
+    digitalWrite(CUT_STEP, HIGH);
     delayMicroseconds(90); // Fast Rotation
-    digitalWrite(CUT_STEP,LOW);
+    digitalWrite(CUT_STEP, LOW);
     delayMicroseconds(90); // Fast Rotation
     display.clearDisplay();
-    }
+  }
   delay(100);
 }
 
 void FEED(int feedcount) {
   int feedsteps = feedcount * 10;
-  digitalWrite(FEED_DIR,LOW);  // Set Feed Forward for Feed
-  for(int y = 0; y < feedsteps; y++) {
-    digitalWrite(FEED_STEP,HIGH);
+  digitalWrite(FEED_DIR, LOW); // Set Feed Forward for Feed
+  for (int y = 0; y < feedsteps; y++) {
+    digitalWrite(FEED_STEP, HIGH);
     delayMicroseconds(700); // Fast Rotation
-    digitalWrite(FEED_STEP,LOW);
+    digitalWrite(FEED_STEP, LOW);
     delayMicroseconds(700); // Fast Rotation
   }
   delay(100);
@@ -316,50 +339,86 @@ void FEED(int feedcount) {
 
 void setSize() {
   while (true) {
-    if (digitalRead(BUTTON_UP) == LOW && SetSize < 1000) SetSize++;
-    else if (digitalRead(BUTTON_DOWN) == LOW && SetSize > 1) SetSize--;
-    delay(150);
-    if (digitalRead(BUTTON_SELECT) == LOW) break;
+    if (readButton(BUTTON_UP) == true && SetSize < 1000) SetSize++;
+    else if (readButton(BUTTON_DOWN) == true && SetSize > 1) SetSize--;
+    //delay(150);
+    if (readButton(BUTTON_SELECT) == true) break;
     display.clearDisplay();
     display.setCursor(0, 0);
     display.setTextSize(2);
     display.print("SET SIZE\n");
-            display.setCursor(4, 17);
+    display.setCursor(4, 17);
     display.setTextSize(3);
     display.println(SetSize);
-  if (SetSize >= 1) { display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 2) { display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 3) { display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 4) { display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 5) { display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 6) { display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 7) { display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 8) { display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 9) { display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 10) { display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 11) { display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 12) { display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 13) { display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 14) { display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 15) { display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 16) { display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 17) { display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE); }
-  if (SetSize >= 18) { display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 1) {
+      display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 2) {
+      display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 3) {
+      display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 4) {
+      display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 5) {
+      display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 6) {
+      display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 7) {
+      display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 8) {
+      display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 9) {
+      display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 10) {
+      display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 11) {
+      display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 12) {
+      display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 13) {
+      display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 14) {
+      display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 15) {
+      display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 16) {
+      display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 17) {
+      display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE);
+    }
+    if (SetSize >= 18) {
+      display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE);
+    }
     display.display();
   }
 }
 
 void setUnits() {
   while (true) {
-    if (digitalRead(BUTTON_UP) == LOW && SetUnits < 1000) SetUnits++;
-    else if (digitalRead(BUTTON_DOWN) == LOW && SetUnits > 1) SetUnits--;
-    delay(100);
-    if (digitalRead(BUTTON_SELECT) == LOW) break;
+    if (readButton(BUTTON_UP) == true && SetUnits < 1000) SetUnits++;
+    else if (readButton(BUTTON_DOWN) == true && SetUnits > 1) SetUnits--;
+    //delay(100);
+    if (readButton(BUTTON_SELECT) == true) break;
     display.clearDisplay();
     display.setCursor(0, 0);
     display.setTextSize(2);
     display.print("SET UNITS\n");
-        display.setCursor(4, 17);
+    display.setCursor(4, 17);
     display.setTextSize(3);
     display.println(SetUnits);
     display.display();
@@ -375,10 +434,10 @@ void runAdjustFWD() {
   display.println(">>> FWD");
   display.display();
 
-    digitalWrite(FEED_DIR,LOW);
-    digitalWrite(FEED_STEP,HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(FEED_STEP,LOW);
+  digitalWrite(FEED_DIR, LOW);
+  digitalWrite(FEED_STEP, HIGH);
+  delayMicroseconds(1000);
+  digitalWrite(FEED_STEP, LOW);
 
   delay(150);
   displayMenu();
@@ -393,10 +452,10 @@ void runAdjustREV() {
   display.println("<<< REV");
   display.display();
 
-    digitalWrite(FEED_DIR,HIGH);
-    digitalWrite(FEED_STEP,HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(FEED_STEP,LOW);
+  digitalWrite(FEED_DIR, HIGH);
+  digitalWrite(FEED_STEP, HIGH);
+  delayMicroseconds(1000);
+  digitalWrite(FEED_STEP, LOW);
 
   delay(150);
   displayMenu();

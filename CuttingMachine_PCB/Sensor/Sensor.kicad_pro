@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.0
+          "min_clearance": 0.5
         }
       },
       "diff_pair_dimensions": [],
@@ -431,7 +431,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "CutMachine_PCB.kicad_pro",
+    "filename": "Sensor.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -466,11 +466,11 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "Gerbers",
+      "plot": "Gerbers/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
-      "svg": "../../../../Desktop/btn",
+      "svg": "",
       "vrml": ""
     },
     "page_layout_descr_file": ""
@@ -576,7 +576,7 @@
   },
   "sheets": [
     [
-      "045417da-1dec-43b1-a5be-6a1935c438f7",
+      "46c9aaa7-8f1e-4e59-addb-1916c8d8b01a",
       "Root"
     ]
   ],
