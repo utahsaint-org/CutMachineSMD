@@ -289,23 +289,9 @@ void runCutProgram() {
 // This will cut one component and make one unit
 // This is just for testing
 void runCutTest() {
-  display.clearDisplay();
-  display.setCursor(0, 0);
-  display.println("    Feeding Tape");
-  display.display();
-FEED(1);
-  delay(1000);
-  display.setCursor(0, 12);
-  display.setTextSize(2);
-  display.println("-- SNIP --");
-  display.display();
-CUT();
-  delay(1000);
-  display.setCursor(0, 22);
-  display.setTextSize(1);
-  display.println("  Clearing CutHead");
-  display.display();
-ClearFeeder();
+  FEED(1);
+  CUT();
+  ClearFeeder();
   delay(500);
   inSubMenu = false;
 }
