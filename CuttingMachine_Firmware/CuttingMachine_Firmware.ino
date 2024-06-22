@@ -40,37 +40,42 @@ const unsigned long debounceDelay = 300; // milliseconds
 unsigned long lastDebounceTime = 10;
 
 void setup() {
+  // Setup Buttons used for Navigation (Up, Down, Back, Select)
   pinMode(BUTTON_UP, INPUT_PULLUP);
   pinMode(BUTTON_DOWN, INPUT_PULLUP);
   pinMode(BUTTON_BACK, INPUT_PULLUP);
   pinMode(BUTTON_SELECT, INPUT_PULLUP);
+  // Setup PIN for Tape Presence Sensor
   pinMode(READ_TAPE, INPUT);
-
+  // Setup PINs for Motor Controls for Feed and Cut
   pinMode(CUT_STEP, OUTPUT);
   pinMode(CUT_DIR, OUTPUT);
   pinMode(FEED_STEP, OUTPUT);
   pinMode(FEED_DIR, OUTPUT);
-
+  // Setup PIN for enableing Motors
   pinMode(ENABLE, OUTPUT);
-  digitalWrite(ENABLE, HIGH); // Disable Motors until we enter Main Menu
+  // Disable Motors until we enter Main Menu HIGH == DISABLED
+  digitalWrite(ENABLE, HIGH);
 
   // Initialize the OLED display
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
-  FirmwareDisplay();
-  delay(1000);
-  LogoDisplay();
-  delay(1500);
+  // Display Firmware and Logo
+  FirmwareDisplay();      //Display Firmware Version
+  LogoDisplay();          //Display Logo Bootscreen
 }
 
-int frame=0;
+  // Define Frame Control Variable
+  int frame=0;
 
 void loop() {
+  // Watch for SELECT Button to enter the Menu
   if (readButton(BUTTON_SELECT) == true) {
     navigateMenu();
   }
+  // Disable Motors if the UP Button was pressed in Idle Screen
   if (readButton(BUTTON_UP) == true) { digitalWrite(ENABLE, HIGH); }
-
+  // Display the Idle Screen Details
   display.clearDisplay();
   display.drawBitmap(78, 0, frames[frame], FRAME_WIDTH, FRAME_HEIGHT, 1);
   display.setCursor(0, 0);
@@ -81,12 +86,14 @@ void loop() {
   display.println(SetSize);
   display.print("Units: ");
   display.println(SetUnits);
+  // Show the state of the Tape Sensor
   if (digitalRead(READ_TAPE) == LOW) {
     display.println("Sensor: LOW");
   } else {
     display.println("Sensor: HIGH");
   }
- if (digitalRead(ENABLE) == LOW) {
+  // Show the state of the Motors
+  if (digitalRead(ENABLE) == LOW) {
     display.println("Motors: ENABd");
   } else {
     display.println("Motors: IDLE");
@@ -97,8 +104,11 @@ void loop() {
   delay(FRAME_DELAY);
 }
 
+
+// Process to handle Button Press Bounces (Smooth UI Handling)
 bool readButton(int buttonPin) {
   if (digitalRead(buttonPin) == LOW) {
+    // Do no detect the press unless its longer than debounceDelay value
     if (millis() - lastDebounceTime > debounceDelay) {
       lastDebounceTime = millis();
       return true;
@@ -107,23 +117,14 @@ bool readButton(int buttonPin) {
   return false;
 }
 
-void FirmwareDisplay() {
-  display.clearDisplay();
-  display.setTextColor(WHITE);
-  display.setTextSize(1);
-  display.print("Firmware: ");
-  display.println(version);
-  display.display();
-}
+// Firmware Screen display
+void FirmwareDisplay() { display.clearDisplay(); display.setTextColor(WHITE); display.setTextSize(1); display.print("Firmware: "); display.println(version); display.display(); delay(1000); }
+// Logo Boot display
+void LogoDisplay() { display.clearDisplay(); display.drawBitmap(0, 0, SCLOGO, 128, 64, SSD1306_WHITE); display.display(); delay(1500);}
 
-void LogoDisplay() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, SCLOGO, 128, 64, SSD1306_WHITE);
-  display.display();
-}
-
+// Main Menu Navigation Routine
 void navigateMenu() {
-  //delay(200);
+  // Enable Motors if the Menu is entered (sticky)
   digitalWrite(ENABLE, LOW);
   while (true) {
     displayMenu();
@@ -154,7 +155,6 @@ void navigateMenu() {
         menuIndex = (menuIndex < 2) ? menuIndex + 1 : 0;
       }
     }
-    //delay(200);
   }
 }
 
@@ -250,26 +250,19 @@ void executeSubmenuOption() {
   }
 }
 
+// Main Cutting Program
 void runCutProgram() {
   display.clearDisplay();
+  // Main process for Cutting
   for (int rp = 0; rp < SetUnits; rp++) {
-    display.setCursor(0, 0);
-    display.setTextSize(2);
-    display.println("CUTTING");
-    display.setTextSize(3);
-    display.setCursor(0, 24);
-    display.print(" = ");
-    display.println(rp + 1);
-    display.display();
+    // Display Cut Status (Units Cut)
+    display.setCursor(0, 0); display.setTextSize(2); display.println("CUTTING"); display.setTextSize(3); display.setCursor(0, 24); display.print(" = "); display.println(rp + 1); display.display();
+    // Sensor Check for Tape Existence (Stop and Display Error)
     if (digitalRead(READ_TAPE) == LOW) {
-      display.clearDisplay();
-      display.setCursor(4, 7);
-      display.setTextSize(2);
-      display.println("!STOPPING!");
-      display.setTextSize(1);
-      display.println("\n    Load or Check\n   component tape.");
-      display.display();
+      // Display Error Message
+      display.clearDisplay(); display.setCursor(4, 7); display.setTextSize(2); display.println("!STOPPING!"); display.setTextSize(1); display.println("\n    Load or Check\n   component tape."); display.display();
       delay(500);
+      // Blink the Display
       for (int i = 0; i < 20; i++) {
         if (i % 2 == 0) {
           display.invertDisplay(true);
@@ -279,25 +272,41 @@ void runCutProgram() {
         display.display();
         delay(500);
       }
+      // Stop and Return if the Sensor is tripped
       return;
     }
+    // Feed the Tape based on the Size Selected
     FEED(SetSize);
+    // Cut the tape after the feed is complete
     CUT();
   }
+  // Clear the cut head
   ClearFeeder(); // Clears the Feed Head
   delay(200);
   inSubMenu = false;
 }
 
+// This will cut one component and make one unit
+// This is just for testing
 void runCutTest() {
   display.clearDisplay();
   display.setCursor(0, 0);
-  display.println("Executing Test Cut");
+  display.println("    Feeding Tape");
   display.display();
-  FEED(1);
-  CUT();
-  ClearFeeder();
-  delay(200);
+FEED(1);
+  delay(1000);
+  display.setCursor(0, 12);
+  display.setTextSize(2);
+  display.println("-- SNIP --");
+  display.display();
+CUT();
+  delay(1000);
+  display.setCursor(0, 22);
+  display.setTextSize(1);
+  display.println("  Clearing CutHead");
+  display.display();
+ClearFeeder();
+  delay(500);
   inSubMenu = false;
 }
 
@@ -313,13 +322,14 @@ void ClearFeeder() {
   digitalWrite(FEED_DIR, HIGH); // Set Reverse
   for (int y = 0; y < ClearCount; y++) {
     digitalWrite(FEED_STEP, HIGH);
-    delayMicroseconds(700); // Fast Rotation
+    delayMicroseconds(1700); // Fast Rotation
     digitalWrite(FEED_STEP, LOW);
-    delayMicroseconds(700); // Fast Rotation
+    delayMicroseconds(1700); // Fast Rotation
   }
   digitalWrite(FEED_DIR, LOW);
 }
 
+// Main CUT Process (One Full Rotation)
 void CUT() {
   int cutsteps = 800;
   for (int x = 0; x < cutsteps; x++) {
@@ -332,6 +342,7 @@ void CUT() {
   delay(100);
 }
 
+// Main FEED Process
 void FEED(int feedcount) {
   int feedsteps = feedcount * 10;
   digitalWrite(FEED_DIR, LOW); // Set Feed Forward for Feed
