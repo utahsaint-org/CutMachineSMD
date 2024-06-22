@@ -55,3 +55,10 @@ Picking the right power-supply is an important aspect of any Stepper Motor confi
 
 ### 3D Printing
 Several of the STL designs need supports to be printed to ensure they are printed correctly.
+
+### Assembly
+
+### Connections
+
+CNC Shield Connections
+- JUMPER:  Ensure that the Y Position has a jumper for PIN 1-2     |::
