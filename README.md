@@ -1,4 +1,4 @@
-# CutMachineFW
+# CutMachineSMD
 
 The Resistor and LED Cutting machine is a community project to make mass-production of small SMD components cut to specific unit sizes faster and easier to make for our highly popular MiniBadge initiatives and standards.  This machine has been used in mass-production and works great for feeding and cutting several component types.
 
