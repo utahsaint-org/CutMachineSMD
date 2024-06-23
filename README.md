@@ -9,7 +9,8 @@ The Resistor and LED Cutting machine is a community project to make mass-product
 - Sharpie Attachment to allow color-coding of components as they are cut
 - Community Contribution
 
-# Parts List:
+# Parts List:  
+### ![Amazon List](https://a.co/ecXTVj9)
 - 2020 Extruded Aluminium cut to
   - 2x 30cm - Top/Bottom
   - 3x 26cm - Verticals
