@@ -1,12 +1,12 @@
 #include <Wire.h>
 
-#include <Adafruit_GFX.h>
+#include <Adafruit_GFX.h> // Library for GFX
+#include <Adafruit_SSD1306.h> // Library for the OLED Screen
 
-#include <Adafruit_SSD1306.h>
+#include "Assets.h" // Library of Images and Bitmaps
+#include "Actions.h" // Library of most machine actions
 
-#include "Assets.h"
-
-#define version "1.0.3"
+#define version "1.0.4" // Several Updates
 #define cuttype "RES" // RES or LED set for Different Types
 
 #define SCREEN_WIDTH 128
@@ -34,6 +34,7 @@ bool inSubMenu = false;
 //Set Default Unit Size
 int SetSize = 1;
 int SetUnits = 1;
+int setInterval = 4; // Tape Interval in millimeters
 
 // Debounce settings
 const unsigned long debounceDelay = 300; // milliseconds
@@ -146,13 +147,13 @@ void navigateMenu() {
       if (inSubMenu) {
         submenuIndex = (submenuIndex > 0) ? submenuIndex - 1 : getMaxSubMenuIndex();
       } else {
-        menuIndex = (menuIndex > 0) ? menuIndex - 1 : 2;
+        menuIndex = (menuIndex > 0) ? menuIndex - 1 : 3;
       }
     } else if (readButton(BUTTON_DOWN) == true) {
       if (inSubMenu) {
         submenuIndex = (submenuIndex < getMaxSubMenuIndex()) ? submenuIndex + 1 : 0;
       } else {
-        menuIndex = (menuIndex < 2) ? menuIndex + 1 : 0;
+        menuIndex = (menuIndex < 3) ? menuIndex + 1 : 0;
       }
     }
   }
@@ -173,6 +174,8 @@ void displayMenu() {
     else display.println("  Settings");
     if (menuIndex == 2) display.println("> CALIBRATE");
     else display.println("  Calibrate");
+    if (menuIndex == 3) display.println("> LOAD TAPE");
+    else display.println("  Load Tape");
   } else {
     if (menuIndex == 0) {
       display.setTextSize(2);
@@ -211,6 +214,15 @@ void displayMenu() {
       if (submenuIndex == 1) display.println("> ADJUST REV");
       else display.println("  Adjust Rev");
     }
+    if (menuIndex ==3) {
+      display.setTextSize(2);
+      display.println("LOAD TAPE");
+      display.setTextSize(1);
+      if (submenuIndex == 0) display.println("> LOAD TAPE");
+      else display.println("  Load Tape");
+      if (submenuIndex == 1) display.println("> UNLOAD TAPE");
+      else display.println("  Unload Tape");
+    }
   }
   display.display();
 }
@@ -228,6 +240,8 @@ int getMaxSubMenuIndex() {
     return 1; // Settings menu has 2 options: Set Size and Set Units
   case 2:
     return 1; // Calibrate menu has 2 options: Adjust FWD and Adjust REV
+  case 3:
+    return 1;
   default:
     return 0;
   }
@@ -246,6 +260,10 @@ void executeSubmenuOption() {
   case 2: // Calibrate
     if (submenuIndex == 0) runAdjustFWD();
     else if (submenuIndex == 1) runAdjustREV();
+    break;
+  case 3:
+    if (submenuIndex == 0) loadTape();
+    else if (submenuIndex == 1) unloadTape();
     break;
   }
 }
@@ -341,6 +359,22 @@ void FEED(int feedcount) {
   delay(100);
 }
 
+
+void loadTape() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("LOAD Function not\nimplemented");
+  display.display();
+  delay(2000);
+}
+void unloadTape() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("UNLOAD Function not\nimplemented");
+  display.display();
+  delay(2000);
+}
+
 void setSize() {
   while (true) {
     if (readButton(BUTTON_UP) == true && SetSize < 1000) SetSize++;
@@ -354,60 +388,24 @@ void setSize() {
     display.setCursor(4, 17);
     display.setTextSize(3);
     display.println(SetSize);
-    if (SetSize >= 1) {
-      display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 2) {
-      display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 3) {
-      display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 4) {
-      display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 5) {
-      display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 6) {
-      display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 7) {
-      display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 8) {
-      display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 9) {
-      display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 10) {
-      display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 11) {
-      display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 12) {
-      display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 13) {
-      display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 14) {
-      display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 15) {
-      display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 16) {
-      display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 17) {
-      display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE);
-    }
-    if (SetSize >= 18) {
-      display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE);
-    }
+    if (SetSize >= 1) { display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 2) { display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 3) { display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 4) { display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 5) { display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 6) { display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 7) { display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 8) { display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 9) { display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 10) { display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 11) { display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 12) { display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 13) { display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 14) { display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 15) { display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 16) { display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 17) { display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 18) { display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE); }
     display.display();
   }
 }
@@ -437,12 +435,10 @@ void runAdjustFWD() {
   display.setTextSize(3);
   display.println(">>> FWD");
   display.display();
-
   digitalWrite(FEED_DIR, LOW);
   digitalWrite(FEED_STEP, HIGH);
   delayMicroseconds(1000);
   digitalWrite(FEED_STEP, LOW);
-
   delay(150);
   displayMenu();
 }
@@ -455,12 +451,10 @@ void runAdjustREV() {
   display.setTextSize(3);
   display.println("<<< REV");
   display.display();
-
   digitalWrite(FEED_DIR, HIGH);
   digitalWrite(FEED_STEP, HIGH);
   delayMicroseconds(1000);
   digitalWrite(FEED_STEP, LOW);
-
   delay(150);
   displayMenu();
 }
