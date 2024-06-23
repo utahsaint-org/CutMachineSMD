@@ -59,6 +59,5 @@ Several of the STL designs need supports to be printed to ensure they are printe
 ### Assembly
 
 ### Connections
+![Electrical Connections](Connections.png)
 
-CNC Shield Connections
-- JUMPER:  Ensure that the Y Position has a jumper for PIN 1-2     |::
