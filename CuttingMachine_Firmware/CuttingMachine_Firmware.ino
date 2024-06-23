@@ -19,7 +19,9 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET);
 #define BUTTON_DOWN A1
 #define BUTTON_BACK A2
 #define BUTTON_SELECT A3
-#define READ_TAPE 13
+// Define Sensors
+#define SENSOR_TAPE 13
+#define SENSOR_UNIT 12
 
 #define CUT_STEP 2 // Cutter Motor Stepper Pin
 #define CUT_DIR 5 // Cutter Motor Direction Pin
@@ -31,9 +33,9 @@ int menuIndex = 0;
 int submenuIndex = 0;
 bool inSubMenu = false;
 
-//Set Default Unit Size
-int SetSize = 1;
-int SetUnits = 1;
+// Default Variable Settings
+int setSize = 1;
+int setUnits = 1;
 int setInterval = 4; // Tape Interval in millimeters
 
 // Debounce settings
@@ -47,7 +49,7 @@ void setup() {
   pinMode(BUTTON_BACK, INPUT_PULLUP);
   pinMode(BUTTON_SELECT, INPUT_PULLUP);
   // Setup PIN for Tape Presence Sensor
-  pinMode(READ_TAPE, INPUT);
+  pinMode(SENSOR_TAPE, INPUT);
   // Setup PINs for Motor Controls for Feed and Cut
   pinMode(CUT_STEP, OUTPUT);
   pinMode(CUT_DIR, OUTPUT);
@@ -84,11 +86,16 @@ void loop() {
   display.println("IDLE");
   display.setTextSize(1);
   display.print("Size: ");
-  display.println(SetSize);
+  display.println(setSize);
   display.print("Units: ");
-  display.println(SetUnits);
+  display.println(setUnits);
   // Show the state of the Tape Sensor
-  if (digitalRead(READ_TAPE) == LOW) {
+  if (digitalRead(SENSOR_TAPE) == LOW) {
+    display.println("Sensor: LOW");
+  } else {
+    display.println("Sensor: HIGH");
+  }
+  if (digitalRead(SENSOR_UNIT) == LOW) {
     display.println("Sensor: LOW");
   } else {
     display.println("Sensor: HIGH");
@@ -99,7 +106,7 @@ void loop() {
   } else {
     display.println("Motors: IDLE");
   }
-  display.println("\nPress SELECT to Start");
+  display.println("Press SELECT to Start");
   display.display();
   frame = (frame + 1) % FRAME_COUNT;
   delay(FRAME_DELAY);
@@ -200,10 +207,10 @@ void displayMenu() {
       display.setTextSize(2);
       display.println("SETTINGS");
       display.setTextSize(1);
-      if (submenuIndex == 0) display.println("> Set Size: " + String(SetSize));
-      else display.println("  Set Size: " + String(SetSize));
-      if (submenuIndex == 1) display.println("> Set Units: " + String(SetUnits));
-      else display.println("  Set Units: " + String(SetUnits));
+      if (submenuIndex == 0) display.println("> Set Size: " + String(setSize));
+      else display.println("  Set Size: " + String(setSize));
+      if (submenuIndex == 1) display.println("> Set Units: " + String(setUnits));
+      else display.println("  Set Units: " + String(setUnits));
     }
     if (menuIndex == 2) {
       display.setTextSize(2);
@@ -254,8 +261,8 @@ void executeSubmenuOption() {
     else if (submenuIndex == 1) runCutTest();
     break;
   case 1: // Settings
-    if (submenuIndex == 0) setSize();
-    else if (submenuIndex == 1) setUnits();
+    if (submenuIndex == 0) changeSize();
+    else if (submenuIndex == 1) changeUnits();
     break;
   case 2: // Calibrate
     if (submenuIndex == 0) runAdjustFWD();
@@ -272,11 +279,11 @@ void executeSubmenuOption() {
 void runCutProgram() {
   display.clearDisplay();
   // Main process for Cutting
-  for (int rp = 0; rp < SetUnits; rp++) {
+  for (int rp = 0; rp < setUnits; rp++) {
     // Display Cut Status (Units Cut)
     display.setCursor(0, 0); display.setTextSize(2); display.println("CUTTING"); display.setTextSize(3); display.setCursor(0, 24); display.print(" = "); display.println(rp + 1); display.display();
     // Sensor Check for Tape Existence (Stop and Display Error)
-    if (digitalRead(READ_TAPE) == LOW) {
+    if (digitalRead(SENSOR_TAPE) == LOW) {
       // Display Error Message
       display.clearDisplay(); display.setCursor(4, 7); display.setTextSize(2); display.println("!STOPPING!"); display.setTextSize(1); display.println("\n    Load or Check\n   component tape."); display.display();
       delay(500);
@@ -294,7 +301,7 @@ void runCutProgram() {
       return;
     }
     // Feed the Tape based on the Size Selected
-    FEED(SetSize);
+    FEED(setSize);
     // Cut the tape after the feed is complete
     CUT();
   }
@@ -375,10 +382,10 @@ void unloadTape() {
   delay(2000);
 }
 
-void setSize() {
+void changeSize() {
   while (true) {
-    if (readButton(BUTTON_UP) == true && SetSize < 1000) SetSize++;
-    else if (readButton(BUTTON_DOWN) == true && SetSize > 1) SetSize--;
+    if (readButton(BUTTON_UP) == true && setSize < 1000) setSize++;
+    else if (readButton(BUTTON_DOWN) == true && setSize > 1) setSize--;
     //delay(150);
     if (readButton(BUTTON_SELECT) == true) break;
     display.clearDisplay();
@@ -387,33 +394,33 @@ void setSize() {
     display.print("SET SIZE\n");
     display.setCursor(4, 17);
     display.setTextSize(3);
-    display.println(SetSize);
-    if (SetSize >= 1) { display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 2) { display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 3) { display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 4) { display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 5) { display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 6) { display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 7) { display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 8) { display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 9) { display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 10) { display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 11) { display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 12) { display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 13) { display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 14) { display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 15) { display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 16) { display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 17) { display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (SetSize >= 18) { display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE); }
+    display.println(setSize);
+    if (setSize >= 1) { display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 2) { display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 3) { display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 4) { display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 5) { display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 6) { display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 7) { display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 8) { display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 9) { display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 10) { display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 11) { display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 12) { display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 13) { display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 14) { display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 15) { display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 16) { display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 17) { display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (setSize >= 18) { display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE); }
     display.display();
   }
 }
 
-void setUnits() {
+void changeUnits() {
   while (true) {
-    if (readButton(BUTTON_UP) == true && SetUnits < 1000) SetUnits++;
-    else if (readButton(BUTTON_DOWN) == true && SetUnits > 1) SetUnits--;
+    if (readButton(BUTTON_UP) == true && setUnits < 1000) setUnits++;
+    else if (readButton(BUTTON_DOWN) == true && setUnits > 1) setUnits--;
     //delay(100);
     if (readButton(BUTTON_SELECT) == true) break;
     display.clearDisplay();
@@ -422,7 +429,7 @@ void setUnits() {
     display.print("SET UNITS\n");
     display.setCursor(4, 17);
     display.setTextSize(3);
-    display.println(SetUnits);
+    display.println(setUnits);
     display.display();
   }
 }
