@@ -31,7 +31,7 @@ For convenience I have an Amazon List for most parts: https://a.co/ecXTVj9
 - Electronics
   - Arduino Uno R3 or similar device.
   - HiLetgo CNC Drive Expansion Board (CNC Shield)
-  - 2.42" 128x64 OLED LCD Display (SSD1309) i2C    
+  - 2.42" 128x64 OLED LCD Display (SSD1309) i2C
 - M3 Hardware
   - Assorted M2 Length Screws, Nuts, Washers
   - Assorted M3 Length Screws, Nuts, Washers
@@ -42,7 +42,17 @@ For convenience I have an Amazon List for most parts: https://a.co/ecXTVj9
 - Power Supplies
   - 12VDC 15A Linear Power Supply
   - 12VDC to 5VDC Stepdown Regulator to power the Arduino
-
+- Components for PCBs ([Digikey](https://digikey.com)/[Mouser](https://mouser.com) or Similar)
+  - 4x 6mm THT PushButton Switchs
+  - 6x 10KΩ SMD  1206 Resistors
+  - 1x 220Ω SMD  1206 Resistor
+  - 1x 2.2KΩ SMD 1206 Resistor
+  - 7+ Position Right-Angle PIN Headers
+  - 3+ Position Straight PIN Headers
+- PCBs Ordered (JLC_PCB or Similar)
+  - [1x Button_Board](https://github.com/utahsaint-org/CutMachineSMD/tree/main/CuttingMachine_PCB/Buttons/Gerbers) 
+  - [2x Sensor_Board](https://github.com/utahsaint-org/CutMachineSMD/tree/main/CuttingMachine_PCB/Sensor/Gerbers)
+    
 # Setup and Configuration
 
 ### OLED Screen Modification
@@ -54,13 +64,34 @@ The Framework for the machine is fairly stratight-forward.  The 30cm struts are 
 ![Frame Dimensions](Dimensions.png)
 
 ### Power Supply
-Picking the right power-supply is an important aspect of any Stepper Motor configuration.   For this machine I used a 12v 15A capable power supply.   This porvided all of the power I needed to run both motors and the arduino electronics.
+Picking the right power-supply is an important aspect of any Stepper Motor configuration.   For this machine I used a 12v 15A capable power supply.   This provided all of the power I needed to run both motors and the arduino electronics.
 
 ### 3D Printing
 Several of the STL designs need supports to be printed to ensure they are printed correctly.
 
-### Assembly
-
 ### Connections
+Connections for all of the components are outlined in the diagram below.
+
 ![Electrical Connections](Connections.png)
 
+### PCB Boards
+The PCB Boards Gerbers are included in this repo.  The following instructions will help you assemble the boards and connect them properly.
+
+#### Button_Board
+- R1, R2, R3, R4 are all **10k Ohm** resistors.
+- Buttons are THT 6mm Momentary Switch.
+- Right-angle PIN HEADERS are suggested exiting out the back.
+- Use a Solder Jumper to connect either 5v or 3v3. (Recommended you use 3v3)
+- Attach the Board with M2 Screws/Bolts to the Display Controller.
+- Attach the Connectors to CNC Shield as labeled in the Connections Diagram.
+
+<img src=img_Button_Board.png width=512>
+
+#### Sensor_Board
+- R1 is 10K Ohm
+- R2 is 220 Ohm (if using it as presence sensor)
+- R2 is 2.2K Ohm (If used as tape position sensor)
+- PIN HEADERS are 3 Position
+- Attach the Board with the M5 Screw to the FeedHead
+  
+<img src=img_Sensor_Board.png height=256>
