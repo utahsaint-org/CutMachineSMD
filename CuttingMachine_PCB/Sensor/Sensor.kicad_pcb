@@ -307,7 +307,7 @@
 			(uuid "f4fa884a-89f2-4d04-bc19-1288a8b2ff42")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 2.54 360)
+			(at 0 2.54 0)
 			(layer "F.Fab")
 			(uuid "7d79de71-ca91-4acd-913d-82bf3cc0e524")
 			(effects
@@ -1043,6 +1043,14 @@
 		(layer "F.Cu")
 		(net 1)
 		(uuid "317fee17-9eee-4689-a541-a41ac72084d5")
+	)
+	(segment
+		(start 142.24 93.674)
+		(end 144.78 93.674)
+		(width 0.4)
+		(layer "F.Cu")
+		(net 1)
+		(uuid "8ab6fa27-1c4d-4ec9-9500-1fad63523a2c")
 	)
 	(segment
 		(start 141.480111 95.247889)
