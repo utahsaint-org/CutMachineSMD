@@ -20,6 +20,7 @@ For convenience I have an Amazon List for most parts: https://a.co/ecXTVj9
   - 1x 155mm - Horizontal Crossmember
   - 1x 155mm - Roll Attachment Crossmember (Optional)
 - 2020 Series Connectors and Corner Bracket Set (30 Piece)
+- Bracket L-Type Internal Connectors for 2020 Series
 - 4x 2020 Series Rubber Feet
 - Stepper Motors
   - NEMA23 4.2Amp Motor (StepperOnline 23HS45-4204S)
