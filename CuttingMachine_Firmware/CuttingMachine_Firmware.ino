@@ -209,12 +209,20 @@ void displayMenu() {
       display.setTextSize(2);
       display.println("SETTINGS");
       display.setTextSize(1);
-      display.print("Test Line: ");
-      display.println(submenuIndex);
-      if (submenuIndex == 0) display.println("> Set Size: " + String(setSize));
-      else display.println("  Set Size: " + String(setSize));
-      if (submenuIndex == 1) display.println("> Set Units: " + String(setUnits));
-      else display.println("  Set Units: " + String(setUnits));
+      if (submenuIndex == 0) { 
+        display.print("> Set Size: ");
+        display.println(setSize);
+      } else { 
+        display.print("  Set Size: ");
+        display.println(setSize);
+      }
+      if (submenuIndex == 1) {
+        display.print("> Set Units: ");
+        display.println(setUnits);
+      } else {
+        display.print("  Set Units: ");
+        display.println(setUnits);
+      }
     }
     if (menuIndex == 2) {
       display.setTextSize(2);
