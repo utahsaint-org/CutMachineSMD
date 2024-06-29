@@ -154,13 +154,13 @@ void navigateMenu() {
       if (inSubMenu) {
         submenuIndex = (submenuIndex > 0) ? submenuIndex - 1 : getMaxSubMenuIndex();
       } else {
-        menuIndex = (menuIndex > 0) ? menuIndex - 1 : 3;
+        menuIndex = (menuIndex > 0) ? menuIndex - 1 : 3; // Adjust this for Menu Number
       }
     } else if (readButton(BUTTON_DOWN) == true) {
       if (inSubMenu) {
         submenuIndex = (submenuIndex < getMaxSubMenuIndex()) ? submenuIndex + 1 : 0;
       } else {
-        menuIndex = (menuIndex < 3) ? menuIndex + 1 : 0;
+        menuIndex = (menuIndex < 3) ? menuIndex + 1 : 0; // Adjust this for Menu Number
       }
     }
   }
@@ -183,6 +183,8 @@ void displayMenu() {
     else display.println("  Calibrate");
     if (menuIndex == 3) display.println("> LOAD TAPE");
     else display.println("  Load Tape");
+    // if (menuIndex == 4) display.println("> RESET");
+    // else display.println("  Reset");
   } else {
     if (menuIndex == 0) {
       display.setTextSize(2);
@@ -207,6 +209,8 @@ void displayMenu() {
       display.setTextSize(2);
       display.println("SETTINGS");
       display.setTextSize(1);
+      display.print("Test Line: ");
+      display.println(submenuIndex);
       if (submenuIndex == 0) display.println("> Set Size: " + String(setSize));
       else display.println("  Set Size: " + String(setSize));
       if (submenuIndex == 1) display.println("> Set Units: " + String(setUnits));
@@ -230,6 +234,15 @@ void displayMenu() {
       if (submenuIndex == 1) display.println("> UNLOAD TAPE");
       else display.println("  Unload Tape");
     }
+    //   if (menuIndex ==4) {
+    //   display.setTextSize(2);
+    //   display.println("RESET?");
+    //   display.setTextSize(1);
+    //   if (submenuIndex == 0) display.println("> NO");
+    //   else display.println("  No");
+    //   if (submenuIndex == 1) display.println("> YES");
+    //   else display.println("  Yes");
+    // }
   }
   display.display();
 }
@@ -272,7 +285,18 @@ void executeSubmenuOption() {
     if (submenuIndex == 0) loadTape();
     else if (submenuIndex == 1) unloadTape();
     break;
+  case 4:
+    if (submenuIndex == 0) resetNo();
+    else if (submenuIndex == 1) resetYes();
+    break;
   }
+}
+
+void resetNo() {
+
+}
+void resetYes() {
+
 }
 
 // Main Cutting Program
