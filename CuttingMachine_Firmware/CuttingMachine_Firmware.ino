@@ -19,9 +19,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET);
 #define BUTTON_DOWN A1
 #define BUTTON_BACK A2
 #define BUTTON_SELECT A3
-// Define Sensors
-#define SENSOR_TAPE 13
-#define SENSOR_UNIT 12
+#define READ_TAPE 13
 
 #define CUT_STEP 2 // Cutter Motor Stepper Pin
 #define CUT_DIR 5 // Cutter Motor Direction Pin
@@ -33,9 +31,9 @@ int menuIndex = 0;
 int submenuIndex = 0;
 bool inSubMenu = false;
 
-// Default Variable Settings
-int setSize = 1;
-int setUnits = 1;
+//Set Default Unit Size
+int SetSize = 1;
+int SetUnits = 1;
 int setInterval = 4; // Tape Interval in millimeters
 
 // Debounce settings
@@ -43,42 +41,43 @@ const unsigned long debounceDelay = 300; // milliseconds
 unsigned long lastDebounceTime = 10;
 
 void setup() {
-  // Setup Buttons used for Navigation (Up, Down, Back, Select)
   pinMode(BUTTON_UP, INPUT_PULLUP);
   pinMode(BUTTON_DOWN, INPUT_PULLUP);
   pinMode(BUTTON_BACK, INPUT_PULLUP);
   pinMode(BUTTON_SELECT, INPUT_PULLUP);
+<<<<<<< HEAD
+  pinMode(READ_TAPE, INPUT);
+
+=======
   // Setup PIN for Tape Presence Sensor
-  pinMode(SENSOR_TAPE, INPUT);
+  pinMode(READ_TAPE, INPUT);
   // Setup PINs for Motor Controls for Feed and Cut
+>>>>>>> parent of 6a9aca2 (Cleanup)
   pinMode(CUT_STEP, OUTPUT);
   pinMode(CUT_DIR, OUTPUT);
   pinMode(FEED_STEP, OUTPUT);
   pinMode(FEED_DIR, OUTPUT);
-  // Setup PIN for enableing Motors
+
   pinMode(ENABLE, OUTPUT);
-  // Disable Motors until we enter Main Menu HIGH == DISABLED
-  digitalWrite(ENABLE, HIGH);
+  digitalWrite(ENABLE, HIGH); // Disable Motors until we enter Main Menu
 
   // Initialize the OLED display
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.clearDisplay();
-  // Display Firmware and Logo
-  FirmwareDisplay();      //Display Firmware Version
-  LogoDisplay();          //Display Logo Bootscreen
+  FirmwareDisplay();
+  delay(1000);
+  LogoDisplay();
+  delay(1500);
 }
 
-  // Define Frame Control Variable
-  int frame=0;
+int frame=0;
 
 void loop() {
-  // Watch for SELECT Button to enter the Menu
   if (readButton(BUTTON_SELECT) == true) {
     navigateMenu();
   }
-  // Disable Motors if the UP Button was pressed in Idle Screen
   if (readButton(BUTTON_UP) == true) { digitalWrite(ENABLE, HIGH); }
-  // Display the Idle Screen Details
+
   display.clearDisplay();
   display.drawBitmap(78, 0, frames[frame], FRAME_WIDTH, FRAME_HEIGHT, 1);
   display.setCursor(0, 0);
@@ -86,37 +85,36 @@ void loop() {
   display.println("IDLE");
   display.setTextSize(1);
   display.print("Size: ");
-  display.println(setSize);
+  display.println(SetSize);
   display.print("Units: ");
-  display.println(setUnits);
+  display.println(SetUnits);
+<<<<<<< HEAD
+=======
   // Show the state of the Tape Sensor
-  if (digitalRead(SENSOR_TAPE) == LOW) {
+>>>>>>> parent of 6a9aca2 (Cleanup)
+  if (digitalRead(READ_TAPE) == LOW) {
     display.println("Sensor: LOW");
   } else {
     display.println("Sensor: HIGH");
   }
-  if (digitalRead(SENSOR_UNIT) == LOW) {
-    display.println("Sensor: LOW");
-  } else {
-    display.println("Sensor: HIGH");
-  }
+<<<<<<< HEAD
+ if (digitalRead(ENABLE) == LOW) {
+=======
   // Show the state of the Motors
   if (digitalRead(ENABLE) == LOW) {
+>>>>>>> parent of 6a9aca2 (Cleanup)
     display.println("Motors: ENABd");
   } else {
     display.println("Motors: IDLE");
   }
-  display.println("Press SELECT to Start");
+  display.println("\nPress SELECT to Start");
   display.display();
   frame = (frame + 1) % FRAME_COUNT;
   delay(FRAME_DELAY);
 }
 
-
-// Process to handle Button Press Bounces (Smooth UI Handling)
 bool readButton(int buttonPin) {
   if (digitalRead(buttonPin) == LOW) {
-    // Do no detect the press unless its longer than debounceDelay value
     if (millis() - lastDebounceTime > debounceDelay) {
       lastDebounceTime = millis();
       return true;
@@ -125,14 +123,23 @@ bool readButton(int buttonPin) {
   return false;
 }
 
-// Firmware Screen display
-void FirmwareDisplay() { display.clearDisplay(); display.setTextColor(WHITE); display.setTextSize(1); display.print("Firmware: "); display.println(version); display.display(); delay(1000); }
-// Logo Boot display
-void LogoDisplay() { display.clearDisplay(); display.drawBitmap(0, 0, SCLOGO, 128, 64, SSD1306_WHITE); display.display(); delay(1500);}
+void FirmwareDisplay() {
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(1);
+  display.print("Firmware: ");
+  display.println(version);
+  display.display();
+}
 
-// Main Menu Navigation Routine
+void LogoDisplay() {
+  display.clearDisplay();
+  display.drawBitmap(0, 0, SCLOGO, 128, 64, SSD1306_WHITE);
+  display.display();
+}
+
 void navigateMenu() {
-  // Enable Motors if the Menu is entered (sticky)
+  //delay(200);
   digitalWrite(ENABLE, LOW);
   while (true) {
     displayMenu();
@@ -163,6 +170,7 @@ void navigateMenu() {
         menuIndex = (menuIndex < 3) ? menuIndex + 1 : 0;
       }
     }
+    //delay(200);
   }
 }
 
@@ -207,10 +215,10 @@ void displayMenu() {
       display.setTextSize(2);
       display.println("SETTINGS");
       display.setTextSize(1);
-      if (submenuIndex == 0) display.println("> Set Size: " + String(setSize));
-      else display.println("  Set Size: " + String(setSize));
-      if (submenuIndex == 1) display.println("> Set Units: " + String(setUnits));
-      else display.println("  Set Units: " + String(setUnits));
+      if (submenuIndex == 0) display.println("> Set Size: " + String(SetSize));
+      else display.println("  Set Size: " + String(SetSize));
+      if (submenuIndex == 1) display.println("> Set Units: " + String(SetUnits));
+      else display.println("  Set Units: " + String(SetUnits));
     }
     if (menuIndex == 2) {
       display.setTextSize(2);
@@ -261,8 +269,8 @@ void executeSubmenuOption() {
     else if (submenuIndex == 1) runCutTest();
     break;
   case 1: // Settings
-    if (submenuIndex == 0) changeSize();
-    else if (submenuIndex == 1) changeUnits();
+    if (submenuIndex == 0) setSize();
+    else if (submenuIndex == 1) setUnits();
     break;
   case 2: // Calibrate
     if (submenuIndex == 0) runAdjustFWD();
@@ -275,19 +283,37 @@ void executeSubmenuOption() {
   }
 }
 
-// Main Cutting Program
 void runCutProgram() {
   display.clearDisplay();
+<<<<<<< HEAD
+  for (int rp = 0; rp < SetUnits; rp++) {
+    display.setCursor(0, 0);
+    display.setTextSize(2);
+    display.println("CUTTING");
+    display.setTextSize(3);
+    display.setCursor(0, 24);
+    display.print(" = ");
+    display.println(rp + 1);
+    display.display();
+    if (digitalRead(READ_TAPE) == LOW) {
+      display.clearDisplay();
+      display.setCursor(4, 7);
+      display.setTextSize(2);
+      display.println("!STOPPING!");
+      display.setTextSize(1);
+      display.println("\n    Load or Check\n   component tape.");
+      display.display();
+=======
   // Main process for Cutting
-  for (int rp = 0; rp < setUnits; rp++) {
+  for (int rp = 0; rp < SetUnits; rp++) {
     // Display Cut Status (Units Cut)
     display.setCursor(0, 0); display.setTextSize(2); display.println("CUTTING"); display.setTextSize(3); display.setCursor(0, 24); display.print(" = "); display.println(rp + 1); display.display();
     // Sensor Check for Tape Existence (Stop and Display Error)
-    if (digitalRead(SENSOR_TAPE) == LOW) {
+    if (digitalRead(READ_TAPE) == LOW) {
       // Display Error Message
       display.clearDisplay(); display.setCursor(4, 7); display.setTextSize(2); display.println("!STOPPING!"); display.setTextSize(1); display.println("\n    Load or Check\n   component tape."); display.display();
+>>>>>>> parent of 6a9aca2 (Cleanup)
       delay(500);
-      // Blink the Display
       for (int i = 0; i < 20; i++) {
         if (i % 2 == 0) {
           display.invertDisplay(true);
@@ -297,27 +323,31 @@ void runCutProgram() {
         display.display();
         delay(500);
       }
-      // Stop and Return if the Sensor is tripped
       return;
     }
+<<<<<<< HEAD
+    FEED(SetSize);
+=======
     // Feed the Tape based on the Size Selected
-    FEED(setSize);
+    FEED(SetSize);
     // Cut the tape after the feed is complete
+>>>>>>> parent of 6a9aca2 (Cleanup)
     CUT();
   }
-  // Clear the cut head
   ClearFeeder(); // Clears the Feed Head
   delay(200);
   inSubMenu = false;
 }
 
-// This will cut one component and make one unit
-// This is just for testing
 void runCutTest() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("Executing Test Cut");
+  display.display();
   FEED(1);
   CUT();
   ClearFeeder();
-  delay(500);
+  delay(200);
   inSubMenu = false;
 }
 
@@ -333,14 +363,13 @@ void ClearFeeder() {
   digitalWrite(FEED_DIR, HIGH); // Set Reverse
   for (int y = 0; y < ClearCount; y++) {
     digitalWrite(FEED_STEP, HIGH);
-    delayMicroseconds(1700); // Fast Rotation
+    delayMicroseconds(700); // Fast Rotation
     digitalWrite(FEED_STEP, LOW);
-    delayMicroseconds(1700); // Fast Rotation
+    delayMicroseconds(700); // Fast Rotation
   }
   digitalWrite(FEED_DIR, LOW);
 }
 
-// Main CUT Process (One Full Rotation)
 void CUT() {
   int cutsteps = 800;
   for (int x = 0; x < cutsteps; x++) {
@@ -353,7 +382,6 @@ void CUT() {
   delay(100);
 }
 
-// Main FEED Process
 void FEED(int feedcount) {
   int feedsteps = feedcount * 10;
   digitalWrite(FEED_DIR, LOW); // Set Feed Forward for Feed
@@ -382,10 +410,10 @@ void unloadTape() {
   delay(2000);
 }
 
-void changeSize() {
+void setSize() {
   while (true) {
-    if (readButton(BUTTON_UP) == true && setSize < 1000) setSize++;
-    else if (readButton(BUTTON_DOWN) == true && setSize > 1) setSize--;
+    if (readButton(BUTTON_UP) == true && SetSize < 1000) SetSize++;
+    else if (readButton(BUTTON_DOWN) == true && SetSize > 1) SetSize--;
     //delay(150);
     if (readButton(BUTTON_SELECT) == true) break;
     display.clearDisplay();
@@ -394,33 +422,33 @@ void changeSize() {
     display.print("SET SIZE\n");
     display.setCursor(4, 17);
     display.setTextSize(3);
-    display.println(setSize);
-    if (setSize >= 1) { display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 2) { display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 3) { display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 4) { display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 5) { display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 6) { display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 7) { display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 8) { display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 9) { display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 10) { display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 11) { display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 12) { display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 13) { display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 14) { display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 15) { display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 16) { display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 17) { display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE); }
-    if (setSize >= 18) { display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE); }
+    display.println(SetSize);
+    if (SetSize >= 1) { display.drawBitmap(0, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 2) { display.drawBitmap(7, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 3) { display.drawBitmap(14, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 4) { display.drawBitmap(21, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 5) { display.drawBitmap(28, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 6) { display.drawBitmap(35, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 7) { display.drawBitmap(42, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 8) { display.drawBitmap(49, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 9) { display.drawBitmap(56, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 10) { display.drawBitmap(63, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 11) { display.drawBitmap(70, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 12) { display.drawBitmap(77, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 13) { display.drawBitmap(84, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 14) { display.drawBitmap(91, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 15) { display.drawBitmap(98, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 16) { display.drawBitmap(105, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 17) { display.drawBitmap(112, 50, RES, 7, 14, SSD1306_WHITE); }
+    if (SetSize >= 18) { display.drawBitmap(119, 50, RES, 7, 14, SSD1306_WHITE); }
     display.display();
   }
 }
 
-void changeUnits() {
+void setUnits() {
   while (true) {
-    if (readButton(BUTTON_UP) == true && setUnits < 1000) setUnits++;
-    else if (readButton(BUTTON_DOWN) == true && setUnits > 1) setUnits--;
+    if (readButton(BUTTON_UP) == true && SetUnits < 1000) SetUnits++;
+    else if (readButton(BUTTON_DOWN) == true && SetUnits > 1) SetUnits--;
     //delay(100);
     if (readButton(BUTTON_SELECT) == true) break;
     display.clearDisplay();
@@ -429,7 +457,7 @@ void changeUnits() {
     display.print("SET UNITS\n");
     display.setCursor(4, 17);
     display.setTextSize(3);
-    display.println(setUnits);
+    display.println(SetUnits);
     display.display();
   }
 }
