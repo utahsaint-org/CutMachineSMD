@@ -89,7 +89,7 @@ The PCB Boards Gerbers are included in this repo.  The following instructions wi
 
 #### Sensor_Board
 - R1 is 10K Ohm
-- R2 is 220 Ohm (if using it as presence sensor)
+- R2 is 470 Ohm (if using it as presence sensor)
 - R2 is 2.2K Ohm (If used as tape position sensor)
 - PIN HEADERS are 3 Position
 - Attach the Board with the M5 Screw to the FeedHead
