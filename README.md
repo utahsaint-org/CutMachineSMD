@@ -42,7 +42,7 @@ For convenience I have an Amazon List for most parts: https://a.co/ecXTVj9
 - 1x Miniature Linear Sliding Guideway Rail 150mm
 - Power Supplies
   - 12VDC 15A Linear Power Supply
-  - 12VDC to 5VDC Stepdown Regulator to power the Arduino
+  - 12VDC to 5VDC Stepdown Regulator to power the Arduino (Optional)
 - Components for PCBs ([Digikey](https://digikey.com)/[Mouser](https://mouser.com) or Similar)
   - 4x 6mm THT PushButton Switchs
   - 6x 10KΩ SMD  1206 Resistors
@@ -72,6 +72,9 @@ Several of the STL designs need **supports** to be printed to ensure they are pr
 NOTE: There are two Cut Heads.  One for Resistors and one for LEDs.
 
 ### Assembly
+Here is what you are building:
+<img src=img_CutMachine.png>
+
 - Build the Framework as described above.
 - Attach the AcrylicCutHead on the Back Side of the machine
 <img src=img_Assembly_Acrylic.png width=384>
@@ -80,6 +83,23 @@ NOTE: There are two Cut Heads.  One for Resistors and one for LEDs.
   - Bottom Screw goes THRU the hole on the blade
   - Top Screw squeezes the blade to the head using a washer
 <img src=img_Assembly_CutHead.png width=384>
+
+- Attach the Razor CutHead to the Slider Rail
+- Attach the FeedHead to the center rails (Horizontal and Vertical)
+  - Align the razor to the slit of the Feedhead
+- Attach and Connect the Display (See connections diagram)
+
+### Firmware and Flashing
+The Firmware is available in the repo.  Use the Arduino IDE application to program the Arduino board.  There are several sources of documentation or videos that can instruct you on how to install and use this program.  If you have issues, limited technical support is available on the <a href=https://discord.gg/saintcon>SAINTCON Discord Server</a> #minibadge-creators
+
+You will need to install the following libraries:
+- Adafruit GFX
+- Adafruit SSD1306 Display
+
+**Board Type should be Arduino Uno (R3)**
+
+Open the *CuttingMachine_Firmware.ino* in the Arduino IDE program
+Compile and upload the Firmware using the appropriate COM Port
 
 ### Connections
 Connections for all of the components are outlined in the diagram below.
