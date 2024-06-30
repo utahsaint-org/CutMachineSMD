@@ -29,8 +29,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET);
 #define CUT_DIR 5 // Cutter Motor Direction Pin
 #define FEED_STEP 3 // Feeder Motor Stepper Pin
 #define FEED_DIR 6 // Feeder Motor Direction Pin
-#define ENABLE 8 // Enable Pin
-
+#define ENABLE 8 // Motor Enable Pin
 
 int menuIndex = 0;
 int submenuIndex = 0;
@@ -39,8 +38,8 @@ unsigned long lastActivityTime = 0;
 const unsigned long inactivityTimeout = 600000;  // 10 Minutes in milliseconds
 
 // Default Variable Settings
-int setSize = 1;
-int setUnits = 1;
+int setSize = 1; // Size of the units |*|*|*|*|*|
+int setUnits = 1; // How many pieces get cut by default
 int setInterval = 4; // Tape Interval in millimeters
 
 // Debounce settings
@@ -73,7 +72,7 @@ void setup() {
   LogoDisplay();          //Display Logo Bootscreen
 }
 
-  // Define Frame Control Variable
+  // Define Frame Control Variable for graphics
   int frame=0;
 
 void loop() {
@@ -87,7 +86,7 @@ void loop() {
     digitalWrite(ENABLE, HIGH); 
     lastActivityTime = millis();
   }
-
+  // Watch for inactivity and enter sleep mode
   if (millis() - lastActivityTime > inactivityTimeout) {
     enterSleepMode();
   }
@@ -96,11 +95,11 @@ void loop() {
   display.drawBitmap(78, 0, frames[frame], FRAME_WIDTH, FRAME_HEIGHT, 1);
   display.setCursor(0, 0);
   display.setTextSize(2);
-  display.println("IDLE");
+  display.println(F("IDLE"));
   display.setTextSize(1);
-  display.print("Size: ");
+  display.print(F("Size: "));
   display.println(setSize);
-  display.print("Units: ");
+  display.print(F("Units: "));
   display.println(setUnits);
   // Show the state of the Tape Sensor
   if (digitalRead(SENSOR_TAPE) == LOW) {
@@ -108,6 +107,7 @@ void loop() {
   } else {
     display.println(F("Sensor: HIGH"));
   }
+  // Show the state of Unit Sensor
   if (digitalRead(SENSOR_UNIT) == LOW) {
     display.println(F("Sensor: LOW"));
   } else {
@@ -115,9 +115,9 @@ void loop() {
   }
   // Show the state of the Motors
   if (digitalRead(ENABLE) == LOW) {
-    display.println(F("Motors: ENABd"));
+    display.println(F("Motors: ENABLED"));
   } else {
-    display.println(F("Motors: IDLE"));
+    display.println(F("Motors: DISABLED"));
   }
   display.println(F("Press SELECT to Start"));
   display.display();
@@ -282,9 +282,9 @@ int getMaxSubMenuIndex() {
   case 2:
     return 1; // Calibrate menu has 2 options: Adjust FWD and Adjust REV
   case 3:
-    return 1;
+    return 1; // LoadTape Menu has 2 options
   case 4:
-    return 1;
+    return 1; // Reset menu has 2 options
   default:
     return 0;
   }
@@ -304,22 +304,22 @@ void executeSubmenuOption() {
     if (submenuIndex == 0) runAdjustFWD();
     else if (submenuIndex == 1) runAdjustREV();
     break;
-  case 3:
+  case 3: // LoadTape Menu
     if (submenuIndex == 0) loadTape();
     else if (submenuIndex == 1) unloadTape();
     break;
-  case 4:
+  case 4: // Reset Menu
     if (submenuIndex == 0) resetNo();
     else if (submenuIndex == 1) resetYes();
     break;
   }
 }
 
-
+/// Sleep Mode Process
 void enterSleepMode() {
   digitalWrite(ENABLE, HIGH);  // Disable Motors so they last longer
+  lastActivityTime = millis();
   inSubMenu=false;
-
 }
 
 void resetNo()  { inSubMenu = false; }
@@ -356,10 +356,9 @@ void runCutProgram() {
       // Stop and Return if the Sensor is tripped
       return;
     }
-    // Feed the Tape based on the Size Selected
-    FEED(setSize);
-    // Cut the tape after the feed is complete
-    CUT();
+    FEED(setSize);  // Feed the Tape based on the Size Selected
+    CUT();  // Cut the tape after the feed is complete
+    lastActivityTime = millis();  // Keep from entering sleepMode while cutting
   }
   // Clear the cut head
   ClearFeeder(); // Clears the Feed Head
@@ -422,7 +421,7 @@ void FEED(int feedcount) {
   delay(100);
 }
 
-
+// Future Tape Loading
 void loadTape() {
   display.clearDisplay();
   display.setCursor(0, 0);
@@ -430,6 +429,7 @@ void loadTape() {
   display.display();
   delay(2000);
 }
+// Future Tape Unloading
 void unloadTape() {
   display.clearDisplay();
   display.setCursor(0, 0);
@@ -451,6 +451,7 @@ void changeSize() {
     display.setCursor(4, 17);
     display.setTextSize(3);
     display.println(setSize);
+    // Display the size of the unit
     if (setSize >= 1) { display.drawBitmap(0, 51, RES, 7, 14, SSD1306_WHITE); }
     if (setSize >= 2) { display.drawBitmap(7, 51, RES, 7, 14, SSD1306_WHITE); }
     if (setSize >= 3) { display.drawBitmap(14, 51, RES, 7, 14, SSD1306_WHITE); }
