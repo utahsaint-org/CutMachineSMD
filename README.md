@@ -68,7 +68,18 @@ The Framework for the machine is fairly stratight-forward.  The 30cm struts are 
 Picking the right power-supply is an important aspect of any Stepper Motor configuration.   For this machine I used a 12v 15A capable power supply.   This provided all of the power I needed to run both motors and the arduino electronics.
 
 ### 3D Printing
-Several of the STL designs need supports to be printed to ensure they are printed correctly.
+Several of the STL designs need **supports** to be printed to ensure they are printed correctly.
+NOTE: There are two Cut Heads.  One for Resistors and one for LEDs.
+
+### Assembly
+- Build the Framework as described above.
+- Attach the AcrylicCutHead on the Back Side of the machine
+<img src=img_Assembly_Acrylic.png width=384>
+
+- Attach a RazorBlade to the Printed CutHead on the outside
+  - Bottom Screw goes THRU the hole on the blade
+  - Top Screw squeezes the blade to the head using a washer
+<img src=img_Assembly_CutHead.png width=384>
 
 ### Connections
 Connections for all of the components are outlined in the diagram below.
